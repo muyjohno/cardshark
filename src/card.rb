@@ -5,6 +5,11 @@ class Card < SimpleDelegator
   ENDPOINT = 'https://netrunnerdb.com/api/2.0/public/cards'.freeze
 
   def self.load!
+    unless File.exists?('./data/cards.json')
+      puts 'Could not load card data! Please run `Card.update!` to download data.`'
+      return
+    end
+
     @all_cards = JSON.parse(
       File.read('./data/cards.json')
     ).map { |c| new(c) }
