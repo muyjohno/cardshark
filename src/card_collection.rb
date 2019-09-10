@@ -16,14 +16,20 @@ class CardCollection < SimpleDelegator
     )
   end
 
+  alias where filter
+
   def apply_filters(filters)
     filters.reduce(self) do |collection, (k, v)|
       collection.select { |c| c.match? k.to_s, v }
     end
   end
 
+  def pluck(attr)
+    map { |c| c.send(attr) }
+  end
+
   def titles
-    map(&:title)
+    pluck(:title)
   end
 
   def unique
@@ -32,5 +38,13 @@ class CardCollection < SimpleDelegator
         unique_cards[card.title] = card
       end.values
     )
+  end
+
+  def legal
+    where(legal?: true)
+  end
+
+  def random
+    sample
   end
 end

@@ -4,8 +4,13 @@ class Card < SimpleDelegator
 
   ENDPOINT = 'https://netrunnerdb.com/api/2.0/public/cards'.freeze
 
+  class << self
+    extend Forwardable
+    def_delegators :all, :filter, :random, :sample, :where
+  end
+
   def self.load!
-    unless File.exists?('./data/cards.json')
+    unless File.exist?('./data/cards.json')
       puts 'Could not load card data! Please run `Card.update!` to download data.`'
       return
     end
@@ -32,18 +37,6 @@ class Card < SimpleDelegator
     @all ||= CardCollection.new(@all_cards)
   end
 
-  def self.random
-    all.sample
-  end
-
-  def self.filter(*args, &block)
-    all.filter(*args, &block)
-  end
-
-  def self.unique
-    all.unique
-  end
-
   def self.find(title)
     filter(title_exact: title).first ||
       filter(title: title).first ||
@@ -59,9 +52,5 @@ class Card < SimpleDelegator
 
   def inspect
     "#<Card:\"#{title}\" #{super}>"
-  end
-
-  class << self
-    alias where filter
   end
 end
