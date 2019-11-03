@@ -24,7 +24,7 @@ module Matchers
     filters = { equals: filters } unless filters.is_a? Hash
 
     filters.all? do |op, val|
-      raise NotSupportedError unless %i[equals min max not].include?(op)
+      raise NotSupportedError unless %i[equals min max not all any none].include?(op)
 
       op = "#{op}?"
 
@@ -50,5 +50,17 @@ module Matchers
 
   def max?(attr, value)
     send(attr) && send(attr) <= value
+  end
+
+  def all?(attr, opts)
+    opts.all? { |value| equals?(attr, value) }
+  end
+
+  def any?(attr, opts)
+    opts.any? { |value| equals?(attr, value) }
+  end
+
+  def none?(*args)
+    !any?(*args)
   end
 end
